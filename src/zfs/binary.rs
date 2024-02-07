@@ -6,11 +6,12 @@ use std::io::{BufReader, Error, Read, Result, Seek, SeekFrom};
 //       as it would require clients to specify such trait all over the place.
 //       Right now wr're using it for reading Files only, and such additional
 //       complexity can't be justified (yet).
+// TODO: Is it ok to capture a reference to File? Should Reader own it? Who knows.
 #[derive(Debug)]
-pub struct Reader(BufReader<File>);
+pub struct Reader<'a>(BufReader<&'a File>);
 
-impl Reader {
-    pub fn new(file: File) -> Self {
+impl<'a> Reader<'a> {
+    pub fn new(file: &'a File) -> Self {
         Reader(BufReader::new(file))
     }
 

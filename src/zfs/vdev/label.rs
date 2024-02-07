@@ -25,8 +25,7 @@ pub fn read_nvlist(
     vdev: &Physical,
     number: LabelNumber
 ) -> std::io::Result<List> {
-    // TODO: The following try_clone() smells very bad.
-    let mut r = Reader::new(vdev.file().try_clone()?);
+    let mut r = Reader::new(vdev.file());
     r.seek(SeekFrom::Start(offset(vdev.size()?, number) + LABEL_NVLIST_OFFSET))?;
     List::read(&mut r)
 }
