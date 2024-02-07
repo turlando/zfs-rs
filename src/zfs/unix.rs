@@ -32,19 +32,19 @@ impl BlockDevice {
         BlockDevice(file)
     }
 
+    pub fn file(&self) -> &File {
+        &self.0
+    }
+
     pub fn size(&self) -> std::io::Result<u64> {
-        let path = self.path()?;
+        let path = self.path()?.with_file_name("size");
         let blocks = std::fs::read_to_string(path)?.trim().parse::<u64>().unwrap();
         Ok(blocks * UNIX_BLOCK_SIZE)
     }
 
-    pub fn path(&self) -> std::io::Result<PathBuf> {
+    fn path(&self) -> std::io::Result<PathBuf> {
         let n = DeviceNumber::from_file(&self.0)?;
-        Ok(PathBuf::from(format!("/sys/dev/block/{}:{}/size", n.major, n.minor)))
-    }
-
-    pub fn file(&self) -> &File {
-        &self.0
+        Ok(PathBuf::from(format!("/sys/dev/block/{}:{}", n.major, n.minor)))
     }
 }
 
