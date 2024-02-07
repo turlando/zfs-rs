@@ -1,6 +1,6 @@
+use crate::binary::Reader;
 use crate::nvlist::List;
 use crate::vdev::physical::Physical;
-use std::io::{Seek, SeekFrom};
 
 const LABEL_SIZE: u64 = 256 * 1024;
 const LABEL_NVLIST_OFFSET: u64 = 16 * 1024;
@@ -24,7 +24,8 @@ pub fn read_nvlist(
     vdev: &Physical,
     number: LabelNumber
 ) -> std::io::Result<List> {
-    let mut r = std::io::BufReader::new(vdev.file());
-    r.seek(SeekFrom::Start(offset(vdev.size()?, number) + LABEL_NVLIST_OFFSET))?;
+    // TODO: The following try_clone() smells very bad.
+    let mut r = Reader::new(vdev.file().try_clone()?);
+    r.skip(offset(vdev.size()?, number) + LABEL_NVLIST_OFFSET)?;
     List::read(&mut r)
 }
