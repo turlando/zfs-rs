@@ -1,6 +1,6 @@
 use std::io::BufReader;
 use std::io::{Error, ErrorKind, Result};
-use std::io::{Read, Seek};
+use std::io::{Read, Seek, SeekFrom};
 
 #[derive(Debug)]
 pub struct List {
@@ -28,6 +28,7 @@ impl StreamHeader {
     fn read<R: Read + Seek>(r: &mut BufReader<R>) -> Result<Self> {
         let encoding = Encoding::read(r)?;
         let endianness = Endianness::read(r)?;
+        r.seek(SeekFrom::Current(2))?; // unused reserved bytes
         Ok(StreamHeader { encoding, endianness })
     }
 }
