@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{BufReader, Error, Read, Result, Seek};
+use std::io::{BufReader, Error, Read, Result, Seek, SeekFrom};
 
 // TODO: Reader should be parametric around the Read + Seek trait.
 //       However, this would make the code way more complex and verbose,
@@ -14,10 +14,13 @@ impl Reader {
         Reader(BufReader::new(file))
     }
 
-    pub fn skip(&mut self, offset: u64) -> Result<u64> {
-        // TODO: Remove .try_into().unwrap(). Maybe just accept an i64?
-        self.0.seek_relative(offset.try_into().unwrap())?;
+    pub fn skip(&mut self, offset: u32) -> Result<u64> {
+        self.0.seek_relative(offset.into())?;
         self.0.stream_position()
+    }
+
+    pub fn seek(&mut self, pos: SeekFrom) -> Result<u64>{
+        self.0.seek(pos)
     }
 
     pub fn read(&mut self, buf: &mut [u8]) -> Result<()> {
