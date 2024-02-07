@@ -3,6 +3,8 @@ use std::os::unix::fs::FileTypeExt;
 use std::os::unix::fs::MetadataExt;
 use std::path::PathBuf;
 
+const UNIX_BLOCK_SIZE: u64 = 512;
+
 #[derive(Debug)]
 pub struct DeviceNumber {
     major: u32,
@@ -33,7 +35,7 @@ impl BlockDevice {
     pub fn size(&self) -> std::io::Result<u64> {
         let path = self.path()?;
         let blocks = std::fs::read_to_string(path)?.trim().parse::<u64>().unwrap();
-        Ok(blocks * 512)
+        Ok(blocks * UNIX_BLOCK_SIZE)
     }
 
     pub fn path(&self) -> std::io::Result<PathBuf> {
