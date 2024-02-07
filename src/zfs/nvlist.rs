@@ -99,6 +99,10 @@ impl Version {
 enum Flags { UniqueName, UniqueNameType }
 
 const FLAGS_SIZE: usize = 4;
+const FLAGS_FROM_MASK: [(u32, Flags); 2] = [
+    (0x1, Flags::UniqueName),
+    (0x2, Flags::UniqueNameType),
+];
 
 impl Flags {
     fn read<R: Read + Seek>(r: &mut BufReader<R>) -> Result<Vec<Self>> {
@@ -110,13 +114,11 @@ impl Flags {
     fn decode(x: &[u8; FLAGS_SIZE]) -> Vec<Self> {
         let i = u32::from_be_bytes(*x);
 
-        let map = [
-            (0x1, Flags::UniqueName),
-            (0x2, Flags::UniqueNameType),
-        ];
-        
         // TODO: Err if garbage in i.
         // TODO: Collect into a preallocated Vec with reasonable size.
-        map.iter().filter(|(flag, _)| i & *flag != 0).map(|(_, val)| *val).collect()
+        FLAGS_FROM_MASK.iter()
+            .filter(|(flag, _)| i & *flag != 0)
+            .map(|(_, val)| *val)
+            .collect()
     }
 }
