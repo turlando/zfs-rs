@@ -1,5 +1,6 @@
 use std::io::{Error, ErrorKind, Result};
 use crate::binary::Reader;
+use crate::xdr::{Bitmask, Enum, EnumMapping};
 
 #[derive(Debug)]
 pub struct List {
@@ -11,12 +12,16 @@ pub struct List {
 impl List {
     pub fn read(r: &mut Reader) -> Result<Self> {
         let header = StreamHeader::read(r)?;
-        let version = Version::read(r)?;
-        let flags = Flags::read(r)?;
+        let version = Version.read(r)?;
+        let flags = Flags.read(r)?;
         Ok(List { header, version, flags })
     }
 }
 
+// Why are Encoding and Endianness not using xdr::Enum? Because they're not
+// XDR-encoded enums: they're 1 byte wide values, while enums in XDR are 32 bit
+// integers. So for now we're keeping this code instead of using the generic
+// implementation. Let's see if it's worth changing this in the furure.
 #[derive(Debug)]
 struct StreamHeader {
     encoding: Encoding,
@@ -70,46 +75,23 @@ impl Endianness {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 enum Version { V0 }
 
-const VERSION_SIZE: usize = 4;
+const VERSIONS: usize = 1;
+const VERSION_MAPPING: EnumMapping<Version, VERSIONS> = [(Version::V0, 0)];
 
-impl Version {
-    fn read(r: &mut Reader) -> Result<Self> {
-        r.try_read_as::<Self, Error, VERSION_SIZE>(Self::decode)
-    }
-
-    fn decode(x: &[u8; VERSION_SIZE]) -> Result<Self> {
-        match i32::from_be_bytes(*x) {
-            0 => Ok(Version::V0),
-            x => Err(Error::new(ErrorKind::InvalidInput, x.to_string()))
-        }
-    }
-}
+#[allow(non_upper_case_globals)]
+const Version: Enum<Version, VERSIONS> = Enum::new(&VERSION_MAPPING);
 
 #[derive(Clone, Copy, Debug)]
 enum Flags { UniqueName, UniqueNameType }
 
-const FLAGS_SIZE: usize = 4;
-const FLAGS_FROM_MASK: [(u32, Flags); 2] = [
-    (0x1, Flags::UniqueName),
-    (0x2, Flags::UniqueNameType),
+const FLAGS: usize = 2;
+const FLAGS_MAPPING: EnumMapping<Flags, FLAGS> = [
+    (Flags::UniqueName, 0x1),
+    (Flags::UniqueNameType, 0x2),
 ];
 
-impl Flags {
-    fn read(r: &mut Reader) -> Result<Vec<Self>> {
-        r.read_as::<Vec<Self>, FLAGS_SIZE>(Self::decode)
-    }
-
-    fn decode(x: &[u8; FLAGS_SIZE]) -> Vec<Self> {
-        let i = u32::from_be_bytes(*x);
-
-        // TODO: Err if garbage in i.
-        // TODO: Collect into a preallocated Vec with reasonable size.
-        FLAGS_FROM_MASK.iter()
-            .filter(|(flag, _)| i & *flag != 0)
-            .map(|(_, val)| *val)
-            .collect()
-    }
-}
+#[allow(non_upper_case_globals)]
+const Flags: Bitmask<Flags, FLAGS> = Bitmask::new(&FLAGS_MAPPING);
