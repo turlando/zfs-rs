@@ -1,4 +1,5 @@
 use std::io::{Error, ErrorKind, Result};
+use enum_macros::int_enum;
 use crate::binary::Reader;
 use crate::xdr::{Bitmask, Enum, EnumMapping};
 
@@ -38,7 +39,11 @@ impl StreamHeader {
 }
 
 #[derive(Debug)]
-enum Encoding { Native, XDR }
+#[int_enum(u8)]
+enum Encoding {
+    Native = 0,
+    XDR    = 1,
+}
 
 const ENCODING_SIZE: usize = 1;
 
@@ -48,16 +53,19 @@ impl Encoding {
     }
 
     fn decode(x: u8) -> Result<Self> {
-        match x {
-            0 => Ok(Encoding::Native),
-            1 => Ok(Encoding::XDR),
-            x => Err(Error::new(ErrorKind::InvalidInput, x.to_string()))
+        match Self::try_from(x) {
+            Ok(v) => Ok(v),
+            Err(n) => Err(Error::new(ErrorKind::InvalidInput, n.to_string()))
         }
     }
 }
 
-#[derive(Clone, Copy, Debug)]
-enum Endianness { Big, Little }
+#[derive(Debug)]
+#[int_enum(u8)]
+enum Endianness {
+    Big    = 0,
+    Little = 1,
+}
 
 const ENDIANNESS_SIZE: usize = 1;
 
@@ -67,10 +75,9 @@ impl Endianness {
     }
 
     fn decode(x: u8) -> Result<Self> {
-        match x {
-            0 => Ok(Endianness::Big),
-            1 => Ok(Endianness::Little),
-            x => Err(Error::new(ErrorKind::InvalidInput, x.to_string()))
+        match Self::try_from(x) {
+            Ok(v) => Ok(v),
+            Err(n) => Err(Error::new(ErrorKind::InvalidInput, n.to_string()))
         }
     }
 }

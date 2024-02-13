@@ -1,18 +1,15 @@
-[package]
+[workspace]
+resolver = "2"
+members = [
+    "enum-macros",
+    "zfs",
+    "zfs-rs",
+]
+
+[workspace.package]
 name = "zfs-rs"
 version = "0.0.1"
 authors = ["Tancredi Orlando <tancredi.orlando@gmail.com>"]
 edition = "2021"
 repository = "https://github.com/turlando/zfs-rs"
 license = "CDDL-1.0"
-
-[lib]
-name = "zfs"
-path = "src/zfs/lib.rs"
-
-[[bin]]
-name = "zfs-rs"
-path = "src/zfs-rs/main.rs"
-
-[dependencies]
-clap = { version = "4.4.18", features = ["derive"] }

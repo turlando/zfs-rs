@@ -1,0 +1,10 @@
+[package]
+name = "zfs"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+
+[dependencies]
+enum-macros = { path = "../enum-macros" }
