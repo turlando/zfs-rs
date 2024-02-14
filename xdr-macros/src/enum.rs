@@ -1,4 +1,4 @@
-use enum_macros_common::int_enum::impl_try_from_type;
+use enum_macros_common::{bitmask::bitmask, int_enum::impl_try_from_type};
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{Ident, ItemEnum, TypePath, parse2};
@@ -8,21 +8,29 @@ use std::str::FromStr;
 // to avoid a circular dependency between the xdr and the xdr-macros crates.
 const I32_SIZE: usize = 4;
 
-pub fn derive_enum(e: ItemEnum) -> TokenStream {
-    let i32_type_path = parse2::<TypePath>(
-        TokenStream::from_str("::core::primitive::i32").unwrap()
-    ).unwrap();
-    let impl_try_from_type = impl_try_from_type::r#impl(
-        &e,
-        // The following unwrap()s can't fail (I hope).
-        &i32_type_path
-    );
+pub fn derive_enum(e: &ItemEnum) -> TokenStream {
+    let impl_try_from_type = impl_try_from_type::r#impl(&e, &i32());
     let r#impl = r#impl(&e.ident);
 
     quote!{
         #impl_try_from_type
         #r#impl
     }
+}
+
+pub fn derive_bitmask(e: &ItemEnum) -> TokenStream {
+    let derive_enum = derive_enum(&e);
+    let bitmask = bitmask(&e, &i32());
+
+    quote!{
+        #derive_enum
+        #bitmask
+    }
+}
+
+fn i32() -> TypePath {parse2::<TypePath>(
+    // The following unwrap()s can't fail (I hope).
+    TokenStream::from_str("::core::primitive::i32").unwrap()).unwrap()
 }
 
 fn r#impl(enum_name: &Ident) -> TokenStream {

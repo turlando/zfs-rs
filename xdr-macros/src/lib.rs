@@ -23,5 +23,11 @@ use syn::{ItemEnum, parse_macro_input};
 #[proc_macro_derive(Enum)]
 pub fn derive_enum(input: TokenStream) -> TokenStream {
     let e = parse_macro_input!(input as ItemEnum);
-    r#enum::derive_enum(e).into()
+    r#enum::derive_enum(&e).into()
+}
+
+#[proc_macro_derive(Bitmask)]
+pub fn derive_bitmask(input: TokenStream) -> TokenStream {
+    let e = parse_macro_input!(input as ItemEnum);
+    r#enum::derive_bitmask(&e).into()
 }

@@ -2,7 +2,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{ItemEnum, TypePath};
 
-pub fn int_enum(e: ItemEnum, t: TypePath) -> TokenStream {
+pub fn int_enum(e: &ItemEnum, t: &TypePath) -> TokenStream {
     let enum_impl = impl_from_enum::r#impl(&e, &t);
     let type_impl = impl_try_from_type::r#impl(&e, &t);
 
@@ -21,14 +21,20 @@ pub mod impl_from_enum {
     pub fn r#impl(e: &ItemEnum, dest_type: &TypePath) -> TokenStream {
         let enum_name = &e.ident;
         let from = from(e);
+        let from_ref = from_ref(e);
 
         quote! {
             impl ::core::convert::From<#enum_name> for #dest_type {
                 #from
             }
+
+            impl ::core::convert::From<&#enum_name> for #dest_type {
+                #from_ref
+            }
         }
     }
 
+    // TODO: Refactor. Try to compact with from_ref().
     fn from(
         ItemEnum{ ident: enum_name, variants, .. }: &ItemEnum
     ) -> TokenStream {
@@ -36,6 +42,21 @@ pub mod impl_from_enum {
 
         quote! {
             fn from(x: #enum_name) -> Self {
+                match x {
+                    #(#cases),*
+                }
+            }
+        }
+    }
+
+    // TODO: Refactor. Try to compact with from().
+    fn from_ref(
+        ItemEnum{ ident: enum_name, variants, .. }: &ItemEnum
+    ) -> TokenStream {
+        let cases = variants.iter().map(|v| case(enum_name, v));
+
+        quote! {
+            fn from(x: &#enum_name) -> Self {
                 match x {
                     #(#cases),*
                 }
