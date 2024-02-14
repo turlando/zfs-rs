@@ -1,7 +1,7 @@
+use binary::Reader;
 use std::io::{Error, ErrorKind, Result};
 use enum_macros::int_enum;
-use crate::binary::Reader;
-use crate::xdr::{Bitmask, Enum, EnumMapping};
+use xdr::{Bitmask, Enum, EnumMapping};
 
 #[derive(Debug)]
 pub struct List {
@@ -13,7 +13,7 @@ pub struct List {
 impl List {
     pub fn read(r: &mut Reader) -> Result<Self> {
         let header = StreamHeader::read(r)?;
-        let version = Version.read(r)?;
+        let version = Version::read(r)?;
         let flags = Flags.read(r)?;
         Ok(List { header, version, flags })
     }
@@ -82,14 +82,8 @@ impl Endianness {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
-enum Version { V0 }
-
-const VERSIONS: usize = 1;
-const VERSION_MAPPING: EnumMapping<Version, VERSIONS> = [(Version::V0, 0)];
-
-#[allow(non_upper_case_globals)]
-const Version: Enum<Version, VERSIONS> = Enum::new(&VERSION_MAPPING);
+#[derive(Debug, Enum)]
+enum Version { V0 = 0 }
 
 #[derive(Clone, Copy, Debug)]
 enum Flags { UniqueName, UniqueNameType }

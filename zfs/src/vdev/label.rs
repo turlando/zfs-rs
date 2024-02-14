@@ -1,5 +1,5 @@
+use binary::Reader;
 use std::io::SeekFrom;
-use crate::binary::Reader;
 use crate::nvlist::List;
 use crate::vdev::physical::Physical;
 

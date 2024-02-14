@@ -1,5 +1,5 @@
 [package]
-name = "enum-macros"
+name = "xdr-macros"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -10,6 +10,8 @@ license.workspace = true
 proc-macro = true
 
 [dependencies]
+binary = { path = "../binary" }
 enum-macros-common = { path = "../enum-macros-common" }
 proc-macro2 = "1.0"
+quote = "1.0"
 syn = { version = "2.0", features = [ "full" ] }

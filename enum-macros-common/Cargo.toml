@@ -1,15 +1,12 @@
 [package]
-name = "enum-macros"
+name = "enum-macros-common"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
 repository.workspace = true
 license.workspace = true
 
-[lib]
-proc-macro = true
-
 [dependencies]
-enum-macros-common = { path = "../enum-macros-common" }
 proc-macro2 = "1.0"
+quote = "1.0"
 syn = { version = "2.0", features = [ "full" ] }

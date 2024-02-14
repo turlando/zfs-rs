@@ -51,6 +51,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "binary"
+version = "0.0.1"
+
+[[package]]
 name = "clap"
 version = "4.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -98,6 +102,15 @@ checksum = "acbf1af155f9b9ef647e42cdc158db4b64a1b61f743629225fde6f3e0be2a7c7"
 
 [[package]]
 name = "enum-macros"
+version = "0.0.1"
+dependencies = [
+ "enum-macros-common",
+ "proc-macro2",
+ "syn",
+]
+
+[[package]]
+name = "enum-macros-common"
 version = "0.0.1"
 dependencies = [
  "proc-macro2",
@@ -225,10 +238,31 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dff9641d1cd4be8d1a070daf9e3773c5f67e78b4d9d42263020c057706765c04"
 
 [[package]]
+name = "xdr"
+version = "0.0.1"
+dependencies = [
+ "binary",
+ "xdr-macros",
+]
+
+[[package]]
+name = "xdr-macros"
+version = "0.0.1"
+dependencies = [
+ "binary",
+ "enum-macros-common",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "zfs"
 version = "0.0.1"
 dependencies = [
+ "binary",
  "enum-macros",
+ "xdr",
 ]
 
 [[package]]

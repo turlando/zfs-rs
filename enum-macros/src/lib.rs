@@ -1,12 +1,11 @@
-mod int_enum;
-
 use proc_macro::TokenStream;
 use syn::{Ident, ItemEnum, parse_macro_input};
+use enum_macros_common::int_enum;
 
 #[proc_macro_attribute]
 pub fn int_enum(attr: TokenStream, input: TokenStream) -> TokenStream {
-    let type_ = parse_macro_input!(attr as Ident);
-    let enum_ = parse_macro_input!(input as ItemEnum);
+    let r#type = parse_macro_input!(attr as Ident);
+    let r#enum = parse_macro_input!(input as ItemEnum);
 
-    int_enum::int_enum(enum_, type_).into()
+    int_enum::int_enum(r#enum, r#type).into()
 }

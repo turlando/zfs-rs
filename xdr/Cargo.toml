@@ -1,5 +1,5 @@
 [package]
-name = "zfs"
+name = "xdr"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -8,5 +8,4 @@ license.workspace = true
 
 [dependencies]
 binary = { path = "../binary" }
-enum-macros = { path = "../enum-macros" }
-xdr = { path = "../xdr" }
+xdr-macros = { path = "../xdr-macros" }

@@ -1,13 +1,16 @@
 [workspace]
 resolver = "2"
 members = [
+    "binary",
     "enum-macros",
+    "enum-macros-common",
+    "xdr",
+    "xdr-macros",
     "zfs",
     "zfs-rs",
 ]
 
 [workspace.package]
-name = "zfs-rs"
 version = "0.0.1"
 authors = ["Tancredi Orlando <tancredi.orlando@gmail.com>"]
 edition = "2021"
