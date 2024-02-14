@@ -1,8 +1,8 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{Ident, ItemEnum};
+use syn::{ItemEnum, TypePath};
 
-pub fn int_enum(r#enum: ItemEnum, r#type: Ident) -> TokenStream {
+pub fn int_enum(r#enum: ItemEnum, r#type: TypePath) -> TokenStream {
     let enum_impl = impl_from_enum::r#impl(&r#enum, &r#type);
     let type_impl = impl_try_from_type::r#impl(&r#enum, &r#type);
 
@@ -16,9 +16,9 @@ pub fn int_enum(r#enum: ItemEnum, r#type: Ident) -> TokenStream {
 pub mod impl_from_enum {
     use proc_macro2::TokenStream;
     use quote::quote;
-    use syn::{Ident, ItemEnum, Variant};
+    use syn::{Ident, ItemEnum, TypePath, Variant};
 
-    pub fn r#impl(e: &ItemEnum, dest_type: &Ident) -> TokenStream {
+    pub fn r#impl(e: &ItemEnum, dest_type: &TypePath) -> TokenStream {
         let enum_name = &e.ident;
         let from = from(e);
 
@@ -59,9 +59,9 @@ pub mod impl_from_enum {
 pub mod impl_try_from_type {
     use proc_macro2::TokenStream;
     use quote::quote;
-    use syn::{Ident, ItemEnum, Variant};
+    use syn::{Ident, ItemEnum, TypePath, Variant};
 
-    pub fn r#impl(e: &ItemEnum, dest_type: &Ident) -> TokenStream {
+    pub fn r#impl(e: &ItemEnum, dest_type: &TypePath) -> TokenStream {
         let enum_name = &e.ident;
         let try_from = try_from(e, dest_type);
 
@@ -75,7 +75,7 @@ pub mod impl_try_from_type {
 
     fn try_from(
         ItemEnum{ ident: enum_name, variants, .. }: &ItemEnum,
-        dest_type: &Ident
+        dest_type: &TypePath
     ) -> TokenStream {
         let cases = variants.iter().map(|v| case(enum_name, v));
 

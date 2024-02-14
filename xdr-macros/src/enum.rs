@@ -1,15 +1,23 @@
 use enum_macros_common::int_enum::impl_try_from_type;
-use proc_macro2::{Span, TokenStream};
+use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{Ident, ItemEnum};
+use syn::{Ident, ItemEnum, TypePath, parse2};
+use std::str::FromStr;
 
-// TODO: Remove as this is already defined in ::xdr::primitive.
+// This is already defined in ::xdr::primitive, but redefining it here allows us
+// to avoid a circular dependency between the xdr and the xdr-macros crates.
 const I32_SIZE: usize = 4;
 
+
+
 pub fn derive_enum(r#enum: ItemEnum) -> TokenStream {
+    let i32_type_path = parse2::<TypePath>(
+        TokenStream::from_str("::core::primitive::i32").unwrap()
+    ).unwrap();
     let impl_try_from_type = impl_try_from_type::r#impl(
         &r#enum, 
-        &Ident::new("i32", Span::call_site())
+        // The following unwrap()s can't fail (I hope).
+        &i32_type_path
     );
     let r#impl = r#impl(&r#enum.ident);
 
