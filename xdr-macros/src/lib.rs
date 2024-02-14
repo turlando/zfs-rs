@@ -22,6 +22,6 @@ use syn::{ItemEnum, parse_macro_input};
 /// have been given assignments in the enum declaration.
 #[proc_macro_derive(Enum)]
 pub fn derive_enum(input: TokenStream) -> TokenStream {
-    let enum_ = parse_macro_input!(input as ItemEnum);
-    r#enum::derive_enum(enum_).into()
+    let e = parse_macro_input!(input as ItemEnum);
+    r#enum::derive_enum(e).into()
 }

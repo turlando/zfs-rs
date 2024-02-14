@@ -8,18 +8,16 @@ use std::str::FromStr;
 // to avoid a circular dependency between the xdr and the xdr-macros crates.
 const I32_SIZE: usize = 4;
 
-
-
-pub fn derive_enum(r#enum: ItemEnum) -> TokenStream {
+pub fn derive_enum(e: ItemEnum) -> TokenStream {
     let i32_type_path = parse2::<TypePath>(
         TokenStream::from_str("::core::primitive::i32").unwrap()
     ).unwrap();
     let impl_try_from_type = impl_try_from_type::r#impl(
-        &r#enum, 
+        &e,
         // The following unwrap()s can't fail (I hope).
         &i32_type_path
     );
-    let r#impl = r#impl(&r#enum.ident);
+    let r#impl = r#impl(&e.ident);
 
     quote!{
         #impl_try_from_type

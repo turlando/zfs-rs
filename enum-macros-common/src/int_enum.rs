@@ -2,12 +2,12 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{ItemEnum, TypePath};
 
-pub fn int_enum(r#enum: ItemEnum, r#type: TypePath) -> TokenStream {
-    let enum_impl = impl_from_enum::r#impl(&r#enum, &r#type);
-    let type_impl = impl_try_from_type::r#impl(&r#enum, &r#type);
+pub fn int_enum(e: ItemEnum, t: TypePath) -> TokenStream {
+    let enum_impl = impl_from_enum::r#impl(&e, &t);
+    let type_impl = impl_try_from_type::r#impl(&e, &t);
 
     quote!{
-        #r#enum
+        #e
         #enum_impl
         #type_impl
     }
