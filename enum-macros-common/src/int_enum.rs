@@ -35,16 +35,10 @@ pub mod impl_from_enum {
     }
 
     // TODO: Refactor. Try to compact with from_ref().
-    fn from(
-        ItemEnum{ ident: enum_name, variants, .. }: &ItemEnum
-    ) -> TokenStream {
-        let cases = variants.iter().map(|v| case(enum_name, v));
-
+    fn from(ItemEnum{ ident: enum_name, .. }: &ItemEnum) -> TokenStream {
         quote! {
             fn from(x: #enum_name) -> Self {
-                match x {
-                    #(#cases),*
-                }
+                Self::from(&x)
             }
         }
     }
