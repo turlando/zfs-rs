@@ -1,8 +1,8 @@
-use enum_macros_common::{bitmask::bitmask, int_enum::impl_try_from_type};
+use enum_macros_common::int_enum::impl_try_from_type;
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{Ident, ItemEnum, TypePath, parse2};
 use std::str::FromStr;
+use syn::{Ident, ItemEnum, TypePath, parse2};
 
 // This is already defined in ::xdr::primitive, but redefining it here allows us
 // to avoid a circular dependency between the xdr and the xdr-macros crates.
@@ -15,16 +15,6 @@ pub fn derive_enum(e: &ItemEnum) -> TokenStream {
     quote!{
         #impl_try_from_type
         #r#impl
-    }
-}
-
-pub fn derive_bitmask(e: &ItemEnum) -> TokenStream {
-    let derive_enum = derive_enum(&e);
-    let bitmask = bitmask(&e, &i32());
-
-    quote!{
-        #derive_enum
-        #bitmask
     }
 }
 

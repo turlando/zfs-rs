@@ -3,4 +3,4 @@
 mod primitive;
 
 pub use crate::primitive::{I32, U32, I64, U64};
-pub use xdr_macros::{Bitmask, Enum};
+pub use xdr_macros::Enum;
