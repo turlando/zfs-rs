@@ -1,7 +1,7 @@
 use binary::Reader;
-use std::io::SeekFrom;
-use crate::nvlist::List;
 use crate::vdev::physical::Physical;
+use std::io::SeekFrom;
+use nvlist::Nvlist;
 
 const LABEL_SIZE: u64 = 256 * 1024;
 const LABEL_NVLIST_OFFSET: u64 = 16 * 1024;
@@ -24,8 +24,8 @@ fn offset(physical_vdev_size: u64, label: LabelNumber) -> u64 {
 pub fn read_nvlist(
     vdev: &Physical,
     number: LabelNumber
-) -> std::io::Result<List> {
+) -> std::io::Result<Nvlist> {
     let mut r = Reader::new(vdev.file());
     r.seek(SeekFrom::Start(offset(vdev.size()?, number) + LABEL_NVLIST_OFFSET))?;
-    List::read(&mut r)
+    Nvlist::read(&mut r)
 }

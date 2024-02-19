@@ -1,5 +1,5 @@
 [package]
-name = "zfs"
+name = "nvlist"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -8,4 +8,5 @@ license.workspace = true
 
 [dependencies]
 binary = { path = "../binary" }
-nvlist = { path = "../nvlist" }
+enum-macros = { path = "../enum-macros" }
+xdr = { path = "../xdr" }

@@ -1,21 +1,19 @@
 use binary::Reader;
-use std::io::{Error, ErrorKind, Result};
 use enum_macros::int_enum;
+use std::io::{Error, ErrorKind, Result};
 use xdr::Enum;
 
 #[derive(Debug)]
-pub struct List {
+pub struct Nvstream {
     header: StreamHeader,
-    version: Version,
-    flags: Flags,
+    nvlist: Nvlist,
 }
 
-impl List {
+impl Nvstream {
     pub fn read(r: &mut Reader) -> Result<Self> {
         let header = StreamHeader::read(r)?;
-        let version = Version::read(r)?;
-        let flags = Flags::read(r)?;
-        Ok(List { header, version, flags })
+        let nvlist = Nvlist::read(r)?;
+        Ok(Nvstream { header, nvlist })
     }
 }
 
@@ -32,6 +30,9 @@ struct StreamHeader {
 impl StreamHeader {
     fn read(r: &mut Reader) -> Result<Self> {
         let encoding = Encoding::read(r)?;
+        if let Encoding::Native = encoding {
+            unimplemented!("native nvlist encoding is not supported");
+        }
         let endianness = Endianness::read(r)?;
         r.skip(2)?; // unused reserved bytes
         Ok(StreamHeader { encoding, endianness })
@@ -82,11 +83,29 @@ impl Endianness {
     }
 }
 
+#[derive(Debug)]
+pub struct Nvlist {
+    version: Version,
+    flags: Flags,
+}
+
+impl Nvlist {
+    pub fn read(r: &mut Reader) -> Result<Self> {
+        let version = Version::read(r)?;
+        let flags = Flags::read(r)?;
+        Ok(Nvlist { version, flags })
+    }
+}
+
 #[derive(Debug, Enum)]
 enum Version { V0 = 0 }
 
 #[derive(Debug, Enum)]
 enum Flags {
-    UniqueName     = 0x1,
-    UniqueNameType = 0x2
+    /// Existing nvpairs with matching names are removed before the new nvpair
+    /// is added.
+    UniqueName = 0x1,
+    /// Existing nvpairs with matching names and data types are removed before
+    /// the new nvpair is added.
+    UniqueNameType = 0x2,
 }

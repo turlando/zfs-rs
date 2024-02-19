@@ -4,6 +4,7 @@ members = [
     "binary",
     "enum-macros",
     "enum-macros-common",
+    "nvlist",
     "xdr",
     "xdr-macros",
     "zfs",
