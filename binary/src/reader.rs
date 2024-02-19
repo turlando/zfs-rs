@@ -15,17 +15,23 @@ impl<'a> Reader<'a> {
         Reader(BufReader::new(file))
     }
 
-    pub fn skip(&mut self, offset: u32) -> Result<u64> {
-        self.0.seek_relative(offset.into())?;
-        self.0.stream_position()
+    pub fn read(&mut self, buf: &mut [u8]) -> Result<()> {
+        self.0.read_exact(buf)
     }
 
     pub fn seek(&mut self, pos: SeekFrom) -> Result<u64>{
         self.0.seek(pos)
     }
 
-    pub fn read(&mut self, buf: &mut [u8]) -> Result<()> {
-        self.0.read_exact(buf)
+    pub fn skip(&mut self, offset: u32) -> Result<u64> {
+        self.0.seek_relative(offset.into())?;
+        self.0.stream_position()
+    }
+
+    pub fn align(&mut self, to: u64) -> Result<u64> {
+        let pos = self.0.stream_position()?;
+        let dest = (pos + (to - 1)) & !(to - 1);
+        self.skip((dest - pos) as u32)
     }
 
     pub fn read_as<T, const N: usize>(
@@ -47,5 +53,28 @@ impl<'a> Reader<'a> {
         let mut buf = [0u8; N];
         self.read(&mut buf)?;
         Ok(f(&buf)?)
+    }
+
+    pub fn read_to<T>(
+        &mut self,
+        len: usize,
+        f: impl FnOnce(Vec<u8>) -> T
+    ) -> Result<T> {
+        let mut buf = vec![0; len];
+        self.read(&mut buf)?;
+        Ok(f(buf))
+    }
+
+    pub fn try_read_to<T, E>(
+        &mut self,
+        len: usize,
+        f: impl FnOnce(Vec<u8>) -> std::result::Result<T, E>
+    ) -> Result<T>
+    where
+        Error: From<E>
+    {
+        let mut buf = vec![0; len];
+        self.read(&mut buf)?;
+        Ok(f(buf)?)
     }
 }
