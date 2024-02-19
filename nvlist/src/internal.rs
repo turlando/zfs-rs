@@ -12,7 +12,10 @@ pub struct Nvstream {
 impl Nvstream {
     pub fn read(r: &mut Reader) -> Result<Self> {
         let header = StreamHeader::read(r)?;
-        let nvlist = Nvlist::read(r)?;
+        let nvlist = match header.encoding {
+            Encoding::Native => unimplemented!("Can't read native nvlist"),
+            Encoding::XDR => Nvlist::read(r)?,
+        };
         Ok(Nvstream { header, nvlist })
     }
 }
@@ -30,9 +33,6 @@ struct StreamHeader {
 impl StreamHeader {
     fn read(r: &mut Reader) -> Result<Self> {
         let encoding = Encoding::read(r)?;
-        if let Encoding::Native = encoding {
-            unimplemented!("native nvlist encoding is not supported");
-        }
         let endianness = Endianness::read(r)?;
         r.skip(2)?; // unused reserved bytes
         Ok(StreamHeader { encoding, endianness })
