@@ -1,5 +1,7 @@
-use clap::Parser;
 use std::path::PathBuf;
+
+use clap::Parser;
+
 use zfs::vdev::physical::Physical;
 use zfs::vdev::label::LabelNumber;
 

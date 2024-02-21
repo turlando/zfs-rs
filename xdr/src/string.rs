@@ -1,6 +1,7 @@
-use binary::Reader;
 use std::io::{Error, Result};
 use std::string::String as StdString;
+
+use binary::Reader;
 
 /// String
 ///

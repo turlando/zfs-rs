@@ -1,5 +1,6 @@
 use proc_macro::TokenStream;
 use syn::{ItemEnum, TypePath, parse_macro_input};
+
 use enum_macros_common::int_enum;
 
 #[proc_macro_attribute]

@@ -1,5 +1,6 @@
-use binary::Reader;
 use std::io::{Result};
+
+use binary::Reader;
 
 /// Integer
 ///

@@ -1,6 +1,8 @@
-use binary::Reader;
-use crate::internal::Nvstream;
 use std::io::Result;
+
+use binary::Reader;
+
+use crate::internal::Nvstream;
 
 #[derive(Debug)]
 pub struct Nvlist {

@@ -1,7 +1,9 @@
-use binary::Reader;
-use crate::vdev::physical::Physical;
 use std::io::SeekFrom;
+
+use binary::Reader;
 use nvlist::Nvlist;
+
+use crate::vdev::physical::Physical;
 
 const LABEL_SIZE: u64 = 256 * 1024;
 const LABEL_NVLIST_OFFSET: u64 = 16 * 1024;

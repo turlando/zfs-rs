@@ -1,9 +1,11 @@
-use enum_macros_common::int_enum::common::{Variant, Variants, get_variants};
-use enum_macros_common::int_enum::impl_try_from_type;
+use std::str::FromStr;
+
 use proc_macro2::TokenStream;
 use quote::quote;
-use std::str::FromStr;
 use syn::{Ident, ItemEnum, TypePath, parse2};
+
+use enum_macros_common::int_enum::common::get_variants;
+use enum_macros_common::int_enum::impl_try_from_type;
 
 // This is already defined in ::xdr::primitive, but redefining it here allows us
 // to avoid a circular dependency between the xdr and the xdr-macros crates.

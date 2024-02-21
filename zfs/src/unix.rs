@@ -1,6 +1,5 @@
 use std::fs::File;
-use std::os::unix::fs::FileTypeExt;
-use std::os::unix::fs::MetadataExt;
+use std::os::unix::fs::{FileTypeExt, MetadataExt};
 use std::path::PathBuf;
 
 const UNIX_BLOCK_SIZE: u64 = 512;
