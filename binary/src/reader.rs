@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::{BufReader, Error, Read, Result, Seek, SeekFrom};
+use std::result::Result as StdResult;
 
 // TODO: Reader should be parametric around the Read + Seek trait.
 //       However, this would make the code way more complex and verbose,
@@ -28,10 +29,17 @@ impl<'a> Reader<'a> {
         self.0.stream_position()
     }
 
-    pub fn align(&mut self, to: u64) -> Result<u64> {
+    pub fn align(&mut self, to: u32) -> Result<u64> {
+        let to: u64 = to.into();
         let pos = self.0.stream_position()?;
         let dest = (pos + (to - 1)) & !(to - 1);
-        self.skip((dest - pos) as u32)
+        let amount: u32 = (dest - pos).try_into().expect(&format!(
+            "can't fit result of {} - {} \
+            (alignment destination - current position) into a u32 \
+            while trying to align to {} bytes boundary",
+            dest, pos, to
+        ));
+        self.skip(amount)
     }
 
     pub fn read_as<T, const N: usize>(
@@ -45,7 +53,7 @@ impl<'a> Reader<'a> {
 
     pub fn try_read_as<T, E, const N: usize>(
         &mut self,
-        f: impl FnOnce(&[u8; N]) -> std::result::Result<T, E>
+        f: impl FnOnce(&[u8; N]) -> StdResult<T, E>
     ) -> Result<T>
     where
         Error: From<E>
@@ -68,7 +76,7 @@ impl<'a> Reader<'a> {
     pub fn try_read_to<T, E>(
         &mut self,
         len: usize,
-        f: impl FnOnce(Vec<u8>) -> std::result::Result<T, E>
+        f: impl FnOnce(Vec<u8>) -> StdResult<T, E>
     ) -> Result<T>
     where
         Error: From<E>

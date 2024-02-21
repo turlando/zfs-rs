@@ -1,5 +1,6 @@
 use binary::Reader;
 use std::io::{Error, Result};
+use std::string::String as StdString;
 
 /// String
 ///
@@ -36,17 +37,17 @@ use std::io::{Error, Result};
 /// It is an error to encode a length greater than the maximum described
 /// in the specification.
 #[derive(Debug)]
-pub struct String(std::string::String);
+pub struct String(StdString);
 
 const STRING_LEN_SIZE: usize = 4;
 
 impl String {
     pub fn read(r: &mut Reader) -> Result<Self> {
-        let len = r.read_as::<u32, STRING_LEN_SIZE>(Self::decode_len)?;
-        let s = String(r.try_read_to::<std::string::String, Error>(
-            len as usize, // FIXME: unsafe conversion from u32 to usize
-            Self::decode_str
-        )?);
+        let len: u32 = r.read_as::<u32, STRING_LEN_SIZE>(Self::decode_len)?;
+        let len: usize = len.try_into().expect(&format!(
+            "can't fit string length of {} into a usize", len
+        ));
+        let s = String(r.try_read_to::<StdString, Error>(len, Self::decode_str)?);
         r.align(4)?;
         Ok(s)
     }
@@ -55,14 +56,14 @@ impl String {
         u32::from_be_bytes(*x)
     }
 
-    fn decode_str(x: Vec<u8>) -> Result<std::string::String> {
-        match std::string::String::from_utf8(x) {
+    fn decode_str(x: Vec<u8>) -> Result<StdString> {
+        match StdString::from_utf8(x) {
             Ok(s) => Ok(s),
             Err(e) => Err(Error::other(e)) // TODO: maybe use InvalidInput?
         }
     }
 }
 
-impl From<String> for std::string::String {
-    fn from(x: String) -> std::string::String { x.0 }
+impl From<String> for StdString {
+    fn from(x: String) -> StdString { x.0 }
 }
